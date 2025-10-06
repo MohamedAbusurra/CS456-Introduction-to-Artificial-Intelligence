@@ -14,4 +14,4 @@ It displays:
 - The order of actions in sequence for found goal path (Up, Down, Left, Right)  
 - Solution cost (number of moves to get from start state to goal state for the found solution path)  
 - Number of nodes generated and expanded during the search methods execution
-- Total search time search time took
+- Total search time for algorithm 
