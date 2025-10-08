@@ -211,14 +211,23 @@ def display_result(path, actions, generated, expanded):
 
 if __name__ == "__main__":
     matrix_size = 3
-    start_state = [8, 7, 6, 0, 4, 1, 2, 5, 3]
+
+    # The start_state is read from "input.txt" in the same folder as the code.
+    # Program written and tested on macOS (reading input files on other OS may or may not work).
+    with open('input.txt', 'r') as file:
+        start_state = [int(number) for line in file for number in line.split()]
+
+    # Manual entry for start state.
+    # start_state = [8, 7, 6, 0, 4, 1, 2, 5, 3]
     goal_state  = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    print(start_state)
 
     start_state_2d_form = reshape(start_state, matrix_size)
     goal_state_2d_form = reshape(goal_state, matrix_size)
 
 
     puzzle = TilePuzzle(start_state_2d_form)
+
 
     while True:
         print("\nSelect the algorithm to solve the Puzzle:")
