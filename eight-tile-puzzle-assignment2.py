@@ -63,6 +63,8 @@ class TilePuzzle:
                 if successor[i][j] not in goal_col and successor[i][j] != 0:
                    heuristic_two += 1
 
+        return heuristic_two
+
 
         
 
@@ -126,7 +128,7 @@ class TilePuzzle:
         actions.reverse()
         return states, actions[1:]  # Skip the initial None action from root
 
-    def greedy_best_first_search(self, start, goal):
+    def greedy_best_first_search(self, start, goal, heuristic):
         # Implements greedy best first Search algorithm
         root = {"state": start, "parent": None, "action": None}
         frontier = deque([root])        # Queue for BFS
@@ -154,7 +156,7 @@ class TilePuzzle:
 
         return None, None, nodes_generated, nodes_expanded
 
-    def greedy_best_first_search(self, start, goal):
+    def a_star_search(self, start, goal, heuristic):
         # Implements A* Search algorithm
         root = {"state": start, "parent": None, "action": None}
         frontier = [root]               # Stack for DFS
@@ -209,7 +211,7 @@ def display_result(path, actions, generated, expanded):
 
 if __name__ == "__main__":
     matrix_size = 3
-    start_state = [8, 7, 6, 0, 4, 1, 2, 5, 3] 
+    start_state = [8, 7, 6, 0, 4, 1, 2, 5, 3]
     goal_state  = [0, 1, 2, 3, 4, 5, 6, 7, 8]
 
     start_state_2d_form = reshape(start_state, matrix_size)
@@ -218,28 +220,48 @@ if __name__ == "__main__":
 
     puzzle = TilePuzzle(start_state_2d_form)
 
-    puzzle.calculate_h2(start_state_2d_form, goal_state_2d_form)
-
     while True:
         print("\nSelect the algorithm to solve the Puzzle:")
         print("1. Greedy-Best First Search")
         print("2. A* Search")
         print("3. Exit")
 
-        choice = input("Enter your choice (1-4): ")
+        choice = input("Enter your choice (1-3): ")
+        
+        print("\nSelect the heuristic of choice for solving the Puzzle:")
+        print("1. Heuristic function h1 (number of tiles that are not in the correct place)")
+        print("1. Heuristic function h2 (number of tiles that are not in the correct row plus number of tiles that are not in the correct column)")
 
-        if choice == "1":
-            print(f"\nInitial configuration: {start_state}\nUsing Greedy-Best First Search:")
+        heuristic_choice = input("Enter your choice (1-2): ")
+
+        if choice == "1" and heuristic_choice == "1":
+            print(f"\nInitial configuration: {start_state}\nUsing Greedy-Best First Search with h1:")
             start = time.time()
-            path, actions, generated, expanded = puzzle.greedy_best_first_search(start_state_2d_form, goal_state_2d_form)
+            path, actions, generated, expanded = puzzle.greedy_best_first_search(start_state_2d_form, goal_state_2d_form, heuristic_choice)
+            end = time.time()
+            display_result(path, actions, generated, expanded)
+            print(f"Search time: {end - start} seconds")
+        
+        if choice == "1" and heuristic_choice == "2":
+            print(f"\nInitial configuration: {start_state}\nUsing Greedy-Best First Search with h2:")
+            start = time.time()
+            path, actions, generated, expanded = puzzle.greedy_best_first_search(start_state_2d_form, goal_state_2d_form, heuristic_choice)
             end = time.time()
             display_result(path, actions, generated, expanded)
             print(f"Search time: {end - start} seconds")
 
-        elif choice == "2":
-            print(f"\nInitial configuration: {start_state}\nUsing A* Search:")
+        elif choice == "2" and heuristic_choice == "1":
+            print(f"\nInitial configuration: {start_state}\nUsing A* Search with h1:")
             start = time.time()
-            path, actions, generated, expanded = puzzle.greedy_best_first_search(start_state_2d_form, goal_state_2d_form)
+            path, actions, generated, expanded = puzzle.a_star_search(start_state_2d_form, goal_state_2d_form, heuristic_choice)
+            end = time.time()
+            display_result(path, actions, generated, expanded)
+            print(f"Search time: {end - start} seconds")
+        
+        elif choice == "2" and heuristic_choice == "2":
+            print(f"\nInitial configuration: {start_state}\nUsing A* Search with h2:")
+            start = time.time()
+            path, actions, generated, expanded = puzzle.a_star_search(start_state_2d_form, goal_state_2d_form, heuristic_choice)
             end = time.time()
             display_result(path, actions, generated, expanded)
             print(f"Search time: {end - start} seconds")
@@ -248,4 +270,4 @@ if __name__ == "__main__":
             break
 
         else:
-            print("Invalid choice. Please enter a number between 1 and 3.")
+            print("Invalid input. Please enter correct numbers for input choices")
