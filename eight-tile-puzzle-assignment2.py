@@ -20,6 +20,58 @@ class TilePuzzle:
         successor = [row[:] for row in state]
         successor[x1][y1], successor[x2][y2] = successor[x2][y2], successor[x1][y1]
         return successor
+    
+    def calculate_h1(self, successor, goal_state):
+
+        heuristic_one = 0 
+        # Traverse the generated tile row by row 
+        # Ignore zero which is the empty tile 
+        # check the value of the generated state with the goal state at each position
+        # If the values do not match the heuristic is incremented by one
+        for i in range(len(successor)):
+            for j in range(len(successor[i])):
+                if successor[i][j] != goal_state[i][j] and successor[i][j] != 0:
+                   heuristic_one += 1
+        print(heuristic_one)
+
+        return heuristic_one
+    
+    
+    def calculate_h2(self, successor, goal_state):
+        heuristic_two = 0
+
+
+        # Traverse the generated tile row by row (row_major order)
+        # Ignore zero which is the empty tile 
+        # At each iteration a goal_row list is generated containing the values present in the goal_state at that row 
+        # Each generated state row value is checked to see if it is contained in the goal_state row list
+        # If it is not present the heuristic is incremented by one
+        for i in range(len(successor)):
+            goal_row = goal_state[i]
+            for j in range(len(successor[i])):
+                if successor[i][j] not in goal_row and successor[i][j] != 0:
+                   heuristic_two += 1
+
+        # Traverse the generated tile column by column (column-major order)
+        # Ignore zero which is the empty tile 
+        # At each iteration a col_row list is generated containing the values present in the goal_state at that col 
+        # Each generated state col value is checked to see if it is contained in the goal_state col list
+        # If it is not present the heuristic is incremented by one
+        for j in range(len(successor[0])):
+            goal_col = [row[j] for row in goal_state]
+            for i in range(len(successor)):
+                if successor[i][j] not in goal_col and successor[i][j] != 0:
+                   heuristic_two += 1
+
+
+        
+
+
+
+
+
+
+
 
     def to_tuple(self, state):
         # Converts board to an immutable tuple form to allow for use in sets
@@ -163,7 +215,10 @@ if __name__ == "__main__":
     start_state_2d_form = reshape(start_state, matrix_size)
     goal_state_2d_form = reshape(goal_state, matrix_size)
 
+
     puzzle = TilePuzzle(start_state_2d_form)
+
+    puzzle.calculate_h2(start_state_2d_form, goal_state_2d_form)
 
     while True:
         print("\nSelect the algorithm to solve the Puzzle:")
