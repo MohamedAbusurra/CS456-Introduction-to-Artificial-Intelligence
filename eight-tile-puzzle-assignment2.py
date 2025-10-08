@@ -1,5 +1,5 @@
-from collections import deque
 import time
+import heapq
 
 class TilePuzzle:
     def __init__(self, tile_board):
@@ -40,7 +40,6 @@ class TilePuzzle:
     def calculate_h2(self, successor, goal_state):
         heuristic_two = 0
 
-
         # Traverse the generated tile row by row (row_major order)
         # Ignore zero which is the empty tile 
         # At each iteration a goal_row list is generated containing the values present in the goal_state at that row 
@@ -64,16 +63,7 @@ class TilePuzzle:
                    heuristic_two += 1
 
         return heuristic_two
-
-
-        
-
-
-
-
-
-
-
+    
 
     def to_tuple(self, state):
         # Converts board to an immutable tuple form to allow for use in sets
@@ -131,13 +121,14 @@ class TilePuzzle:
     def greedy_best_first_search(self, start, goal, heuristic):
         # Implements greedy best first Search algorithm
         root = {"state": start, "parent": None, "action": None}
-        frontier = deque([root])        # Queue for BFS
+        frontier = []
+        heapq.heappush(frontier,root)
         explored = set([self.to_tuple(start)]) 
         nodes_generated = 1
         nodes_expanded = 0
 
         while frontier:
-            node = frontier.popleft()   
+            _ , node = heapq.heappop(frontier)
             nodes_expanded += 1
             state = node["state"]
 
@@ -151,7 +142,7 @@ class TilePuzzle:
                 key = self.to_tuple(successor)
                 if key not in explored:
                     explored.add(key)
-                    frontier.append({"state": successor, "parent": node, "action": action})
+                    frontier.append(self.h1(successor, goal),{"state": successor, "parent": node, "action": action})
                     nodes_generated += 1
 
         return None, None, nodes_generated, nodes_expanded
