@@ -3,59 +3,60 @@ import heapq
 
 class TilePuzzle:
     def __init__(self, tile_board):
-        # Initializes the puzzle board and stores its size
+        # Initializes the puzzle board and stores its size.
+        # Keeps a copy of the original input state in case it is altered elsewhere in the program.
+        # The size n of the board is recorded for boundary checks.
         self.board = [row[:] for row in tile_board]
         self.n = len(tile_board)
 
     def find_blank(self, state):
-        # Locates the position of the blank (0) in the puzzle
+        # Locates the position of the blank (0) in the puzzle.
+        # Traverses the 2D list and returns the coordinates of the blank (0) when found.
         for i in range(self.n):
             for j in range(self.n):
                 if state[i][j] == 0:
                     return i, j
-        return None  # Added for safety, There should always be exactly one blank
+        return None  # Added for safety; in a valid puzzle there should always be exactly one blank.
 
     def copy_and_swap(self, state, x1, y1, x2, y2):
-        # Creates a copy of the board and swaps the two given positions
+        # Creates a copy of the board so swapping does not alter the original state.
+        # Swaps the two tiles at the given coordinates and returns the new board state.
         successor = [row[:] for row in state]
         successor[x1][y1], successor[x2][y2] = successor[x2][y2], successor[x1][y1]
         return successor
     
     def calculate_h1(self, successor, goal_state):
-
         heuristic_one = 0 
-        # Traverse the generated tile row by row 
-        # Ignore zero which is the empty tile 
-        # check the value of the generated state with the goal state at each position
-        # If the values do not match the heuristic is incremented by one
+        # Traverse the generated tiles row by row.
+        # Ignore zero which is the empty tile.
+        # Check each value against the goal state at the same position.
+        # If the values do not match (and the tile is not 0), increment the heuristic by one.
         for i in range(len(successor)):
             for j in range(len(successor[i])):
                 if successor[i][j] != goal_state[i][j] and successor[i][j] != 0:
                    heuristic_one += 1
-        print(heuristic_one)
 
         return heuristic_one
-    
     
     def calculate_h2(self, successor, goal_state):
         heuristic_two = 0
 
-        # Traverse the generated tile row by row (row_major order)
-        # Ignore zero which is the empty tile 
-        # At each iteration a goal_row list is generated containing the values present in the goal_state at that row 
-        # Each generated state row value is checked to see if it is contained in the goal_state row list
-        # If it is not present the heuristic is incremented by one
+        # Traverse the grid row by row (row-major order).
+        # Ignore zero, which is the empty tile.
+        # For each row, get the corresponding row from the goal_state.
+        # For each tile, check if its value appears anywhere in that goal row (ignoring 0).
+        # If it is not present, increment the heuristic.
         for i in range(len(successor)):
             goal_row = goal_state[i]
             for j in range(len(successor[i])):
                 if successor[i][j] not in goal_row and successor[i][j] != 0:
                    heuristic_two += 1
 
-        # Traverse the generated tile column by column (column-major order)
-        # Ignore zero which is the empty tile 
-        # At each iteration a col_row list is generated containing the values present in the goal_state at that col 
-        # Each generated state col value is checked to see if it is contained in the goal_state col list
-        # If it is not present the heuristic is incremented by one
+        # Traverse the grid column by column (column-major order).
+        # Ignore zero, which is the empty tile.
+        # For each column, build the list of values from that column in the goal_state.
+        # For each tile, check if its value appears anywhere in that goal column (ignoring 0).
+        # If it is not present, increment the heuristic.
         for j in range(len(successor[0])):
             goal_col = [row[j] for row in goal_state]
             for i in range(len(successor)):
@@ -64,71 +65,88 @@ class TilePuzzle:
 
         return heuristic_two
     
-
     def to_tuple(self, state):
-        # Converts board to an immutable tuple form to allow for use in sets
+        # Converts the board state to an immutable tuple form to allow for use in sets.
+        # Used to keep track of explored states to prevent re-exploring the same state in a search.
         return tuple(tuple(row) for row in state)
 
     def move_up(self, state):
-        # Moves the blank tile up if possible
+        # Moves the blank tile up if possible.
+        # Checks that the blank tile is not on the top row (x > 0) before swapping.
         x, y = self.find_blank(state)
         if x > 0:
             return self.copy_and_swap(state, x, y, x-1, y), "Up"
         return None, None
 
     def move_down(self, state):
-        # Moves the blank tile down if possible
+        # Moves the blank tile down if possible.
+        # Checks that the blank tile is not on the bottom row (x < self.n - 1) before swapping.
         x, y = self.find_blank(state)
         if x < self.n - 1:
             return self.copy_and_swap(state, x, y, x+1, y), "Down"
         return None, None
 
     def move_left(self, state):
-        # Moves the blank tile left if possible
+        # Moves the blank tile left if possible.
+        # Checks that the blank tile is not in the leftmost column (y > 0) before swapping.
         x, y = self.find_blank(state)
         if y > 0:
             return self.copy_and_swap(state, x, y, x, y-1), "Left"
         return None, None
 
     def move_right(self, state):
-        # Moves the blank tile right if possible
+        # Moves the blank tile right if possible.
+        # Checks that the blank tile is not in the rightmost column (y < self.n - 1) before swapping.
         x, y = self.find_blank(state)
         if y < self.n - 1:
             return self.copy_and_swap(state, x, y, x, y+1), "Right"
         return None, None
 
     def expand_node(self, state):
-        # Generates all possible successor states from the current state
+        # Expands the current state into all possible successor states.
+        # Creates a list to store valid next states and their corresponding actions.
+        # Defines a list called 'operator' containing the move functions to generate expanded states.
+        # Iterates through the operators, returning the new_state and action if move possible.
+        # Unpacks and stores each successor and action.
+        # Returns the list of possible moves.
         successors = []
+        # Creates a list of all possible next action functions.
+        # Calls action functions with the state passed as a parameter.
+        # Only add results that are not None (i.e., legal moves).
         for operator in [self.move_up, self.move_down, self.move_left, self.move_right]:
             successor, action = operator(state)
             if successor is not None:
                 successors.append((successor, action))
         return successors
 
-    def reconstruct(self, node):
-        # Reconstructs the path and actions from the goal back to the start
+    def reconstruct(self, state):
+        # Reconstructs the path and actions from the start to the goal.
+        # Starts from the provided goal node and follows parent links back to the start.
+        # Initializes two lists. "states" which stores each board configuration, and "actions" stores the move that led to it.
+        # Traverses from goal back to start using the parent links, storing states and actions.
+        # Once the start is reached, reverse both lists to get start to goal order.
+        # The start state has no action, so it is skipped in the returned actions.
         states, actions = [], []
-        current = node
-        while current is not None:
-            states.append(current["state"])
-            actions.append(current["action"])
-            current = current["parent"]
+        explore = state
+        while explore is not None:
+            states.append(explore["state"])
+            actions.append(explore["action"])
+            explore = explore["parent"]
         states.reverse()
         actions.reverse()
-        return states, actions[1:]  # Skip the initial None action from root
+        return states, actions[1:]  # Skips the initial None action from root
 
     def greedy_best_first_search(self, start, goal, heuristic):
-        # Implements greedy best first Search algorithm
+        # Implements Greedy Best-First Search algorithm.
         root = {"state": start, "parent": None, "action": None}
         frontier = []
-        heapq.heappush(frontier,root)
+        heapq.heappush(frontier, root)
         explored = set([self.to_tuple(start)]) 
         nodes_generated = 1
         nodes_expanded = 0
 
         while frontier:
-            _ , node = heapq.heappop(frontier)
+            _, node = heapq.heappop(frontier)
             nodes_expanded += 1
             state = node["state"]
 
@@ -137,18 +155,18 @@ class TilePuzzle:
                 path, actions = self.reconstruct(node)
                 return path, actions, nodes_generated, nodes_expanded
 
-            # Expand the current node and add unseen states to frontier
+            # Expands the current state and adds non-explored states to frontier
             for successor, action in self.expand_node(state):
                 key = self.to_tuple(successor)
                 if key not in explored:
                     explored.add(key)
-                    frontier.append(self.h1(successor, goal),{"state": successor, "parent": node, "action": action})
+                    frontier.append(self.h1(successor, goal), {"state": successor, "parent": node, "action": action})
                     nodes_generated += 1
 
         return None, None, nodes_generated, nodes_expanded
 
     def a_star_search(self, start, goal, heuristic):
-        # Implements A* Search algorithm
+        # Implements A* Search algorithm.
         root = {"state": start, "parent": None, "action": None}
         frontier = [root]               # Stack for DFS
         explored = set([self.to_tuple(start)])
@@ -176,17 +194,24 @@ class TilePuzzle:
         return None, None, nodes_generated, nodes_expanded
 
 
-def reshape(flat_list, n):
-    # Converts a 1D list into a 2D list
+def reshape(list_one, n):
+    # Converts a 1D list into a 2D list.
+    # Creates an empty board list to store rows.
+    # For each row (from 0 to n-1), slice n values from the flat list in order.
+    # Returns a 2D list representing the tile puzzle.
     board = []
-    idx = 0
+    index = 0
     for _ in range(n):
-        board.append(flat_list[idx:idx+n])
-        idx += n
+        board.append(list_one[index:index+n])
+        index += n
     return board
 
 def display_result(path, actions, generated, expanded):
-    # Displays the solution path, actions, and search statistics
+    # Displays the solution path, actions, and search statistics.
+    # Checks if a goal path exists. If it does not, it prints 'No solution found' and exits the function.
+    # If a goal path exists, iterates over each state, printing the step number and board.
+    # Uses len(actions)(sum of actions) as the path cost as each move has uniform cost of 1.
+    # Finally prints nodes generated and expanded so algorithms can be compared by performance metrics.
     if path is None:
         print("No solution found.\n")
         return
@@ -216,9 +241,7 @@ if __name__ == "__main__":
     start_state_2d_form = reshape(start_state, matrix_size)
     goal_state_2d_form = reshape(goal_state, matrix_size)
 
-
     puzzle = TilePuzzle(start_state_2d_form)
-
 
     while True:
         print("\nSelect the algorithm to solve the Puzzle:")
@@ -230,7 +253,7 @@ if __name__ == "__main__":
         
         print("\nSelect the heuristic of choice for solving the Puzzle:")
         print("1. Heuristic function h1 (number of tiles that are not in the correct place)")
-        print("1. Heuristic function h2 (number of tiles that are not in the correct row plus number of tiles that are not in the correct column)")
+        print("2. Heuristic function h2 (number of tiles that are not in the correct row plus number of tiles that are not in the correct column)")
 
         heuristic_choice = input("Enter your choice (1-2): ")
 
