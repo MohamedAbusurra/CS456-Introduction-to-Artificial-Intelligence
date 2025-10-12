@@ -206,7 +206,7 @@ def reshape(list_one, n):
         index += n
     return board
 
-def display_result(path, actions, generated, expanded):
+def display_result(path, actions, generated, expanded, print_steps = False):
     # Displays the solution path, actions, and search statistics.
     # Checks if a goal path exists. If it does not, it prints 'No solution found' and exits the function.
     # If a goal path exists, iterates over each state, printing the step number and board.
@@ -215,12 +215,14 @@ def display_result(path, actions, generated, expanded):
     if path is None:
         print("No solution found.\n")
         return
-    for step, state in enumerate(path):
-        print(f"Step {step}:")
-        for row in state:
-            print(row)
-        print()
-    print("Actions:", actions)
+    if print_steps:
+         for step, state in enumerate(path):
+             print(f"Step {step}:")
+             for row in state:
+               print(row)
+             print()
+         print("Actions:", actions)
+
     print("Solution Cost:", len(actions), "moves")
     print("Nodes Generated:", generated)
     print("Nodes Expanded:", expanded)
@@ -258,7 +260,7 @@ if __name__ == "__main__":
         heuristic_choice = input("Enter your choice (1-2): ")
 
         if choice == "1" and heuristic_choice == "1":
-            print(f"\nInitial configuration: {start_state}\nUsing Greedy-Best First Search with h1:")
+            print(f"\nInitial configuration: {start_state}\nUsing Greedy-Best First Search with h1")
             start = time.time()
             path, actions, generated, expanded = puzzle.greedy_best_first_search(start_state_2d_form, goal_state_2d_form, heuristic_choice)
             end = time.time()
@@ -266,7 +268,7 @@ if __name__ == "__main__":
             print(f"Search time: {end - start} seconds")
         
         if choice == "1" and heuristic_choice == "2":
-            print(f"\nInitial configuration: {start_state}\nUsing Greedy-Best First Search with h2:")
+            print(f"\nInitial configuration: {start_state}\nUsing Greedy-Best First Search with h2")
             start = time.time()
             path, actions, generated, expanded = puzzle.greedy_best_first_search(start_state_2d_form, goal_state_2d_form, heuristic_choice)
             end = time.time()
@@ -274,7 +276,7 @@ if __name__ == "__main__":
             print(f"Search time: {end - start} seconds")
 
         elif choice == "2" and heuristic_choice == "1":
-            print(f"\nInitial configuration: {start_state}\nUsing A* Search with h1:")
+            print(f"\nInitial configuration: {start_state}\nUsing A* Search with h1")
             start = time.time()
             path, actions, generated, expanded = puzzle.a_star_search(start_state_2d_form, goal_state_2d_form, heuristic_choice)
             end = time.time()
@@ -282,7 +284,7 @@ if __name__ == "__main__":
             print(f"Search time: {end - start} seconds")
         
         elif choice == "2" and heuristic_choice == "2":
-            print(f"\nInitial configuration: {start_state}\nUsing A* Search with h2:")
+            print(f"\nInitial configuration: {start_state}\nUsing A* Search with h2")
             start = time.time()
             path, actions, generated, expanded = puzzle.a_star_search(start_state_2d_form, goal_state_2d_form, heuristic_choice)
             end = time.time()
