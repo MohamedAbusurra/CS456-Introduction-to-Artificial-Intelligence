@@ -137,33 +137,65 @@ class TilePuzzle:
         return states, actions[1:]  # Skips the initial None action from root
 
     def greedy_best_first_search(self, start, goal, heuristic):
-        # Implements Greedy Best-First Search algorithm.
+        # Implements Greedy Best-First Search algorithm using a heap (priority queue).
+        # Initializes the root node containing starting state, no parent, and no action
         root = {"state": start, "parent": None, "action": None}
+
+        # Create an empty list to act as the frontier (priority queue)
+        # The counter is used as a tie breaker for equal priorities so a dict is used not as a tie breaker 
         frontier = []
-        heapq.heappush(frontier, root)
-        explored = set([self.to_tuple(start)]) 
+        counter = 0
+
+        # Condition so the heuristic chosen during the input is called during the search
+        if heuristic == "1":
+            heapq.heappush(frontier,(self.calculate_h1(start,goal), counter, root))
+        else:
+            heapq.heappush(frontier,(self.calculate_h2(start,goal), counter, root))
+        
+        # Initializes a set to keep track of explored states so they can be stored in a set
+        explored = set([self.to_tuple(start)])
+        #nodes_generated and nodes_expanded initialized to keep track of number of nodes expanded and generated
         nodes_generated = 1
         nodes_expanded = 0
 
-        while frontier:
-            _, node = heapq.heappop(frontier)
+        # Searches until frontier is empty or goal is found
+        while frontier: 
+            #takes Node with lost heuristic first (GFS condition) from the frontier
+            _,_,node = heapq.heappop(frontier)
             nodes_expanded += 1
             state = node["state"]
 
-            # Check if the goal state is reached
+            # Checks to see if current state is the goal state
+            # if goal state, construct path and actions and return solution
             if state == goal:
                 path, actions = self.reconstruct(node)
                 return path, actions, nodes_generated, nodes_expanded
+            
 
-            # Expands the current state and adds non-explored states to frontier
+            # Expands current state with all possible successor statees
+            # If a sucessor state has not been explored than compute its priority and store in the frontier
             for successor, action in self.expand_node(state):
                 key = self.to_tuple(successor)
                 if key not in explored:
-                    explored.add(key)
-                    frontier.append(self.h1(successor, goal), {"state": successor, "parent": node, "action": action})
+                    # Marks state as explored to add revisiting it during the same search
+                    explored.add(key) 
+                    counter += 1
+                    # Builds the new node with a link back to the parent and action for reconstructing solution
+                    new_node = {"state": successor, "parent": node, "action": action}
+                    # Calls the heuristic user chose to compute prioirity for newly expanded state
+                    if heuristic == "1":
+                        priority = self.calculate_h1(successor, goal)
+                    else:
+                        priority = self.calculate_h2(successor, goal)
+                    # pushes new node to the frontier with priority, counter (to resolve tie breaks)
+                    heapq.heappush(frontier, (priority, counter, new_node))
                     nodes_generated += 1
 
+        # If frontier becomes empty without returning a solutoin, It returns none as no solution exists
         return None, None, nodes_generated, nodes_expanded
+
+
+
 
     def a_star_search(self, start, goal, heuristic):
         # Implements A* Search algorithm.
@@ -267,7 +299,7 @@ if __name__ == "__main__":
             display_result(path, actions, generated, expanded)
             print(f"Search time: {end - start} seconds")
         
-        if choice == "1" and heuristic_choice == "2":
+        elif choice == "1" and heuristic_choice == "2":
             print(f"\nInitial configuration: {start_state}\nUsing Greedy-Best First Search with h2")
             start = time.time()
             path, actions, generated, expanded = puzzle.greedy_best_first_search(start_state_2d_form, goal_state_2d_form, heuristic_choice)
