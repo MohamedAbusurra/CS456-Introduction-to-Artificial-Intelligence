@@ -5,7 +5,7 @@ import java.util.HashSet;
 
 public class TilePuzzle {
 
-    private int n = 3;
+    private final int n = 3;
 
     private final int[][] goal = {
             {0, 1, 2},
@@ -281,10 +281,9 @@ public class TilePuzzle {
             path.add(node);
         Collections.reverse(path);
 
-
+        System.out.println();
         boolean printSteps = false;
         boolean printPath = false;
-        System.out.println("Solution");
         if(printSteps){
             for (int i = 1; i < path.size(); i++) {
                 System.out.println("Step " + i + ": ");
@@ -300,9 +299,9 @@ public class TilePuzzle {
             System.out.print("]");
             System.out.println();
         }
-        System.out.println("number of actions:" + (path.size() - 1));
         System.out.println("number of nodes entered frontier: " + enteredNodesCounter);
         System.out.println("number of expanded frontier: " + expandedNodesCounter);
+        System.out.println("cost path for solution: " + (path.size() - 1));
 
     }
 
@@ -331,7 +330,6 @@ public class TilePuzzle {
         while (!frontier.isEmpty()) {
             int index = lowestFrontierGreedyIndex(frontier);
             Node node = frontier.remove(index);
-            expandedNodesCounter++;
 
             if (isGoal(node.state)) {
                 printSolution(node, enteredNodesCounter, expandedNodesCounter);
@@ -340,7 +338,9 @@ public class TilePuzzle {
 
             if (expanded.contains(node))
                 continue;
+
             expanded.add(node);
+            expandedNodesCounter++;
 
             ArrayList<Node> successorNodes = successors(node, heuristicChoice);
             for (int i = 0; i < successorNodes.size(); i++) {
@@ -373,10 +373,9 @@ public class TilePuzzle {
         enteredNodesCounter++;
 
         while (!frontier.isEmpty()) {
-            // lowest f(n) board configuration is expanded and checked to see if goal state
+            // lowest f(n) board configuration is taken and checked to see if goal state
             int index = lowestAStarIndex(frontier);
             Node node = frontier.remove(index);
-            expandedNodesCounter++;
 
             if (isGoal(node.state)) {
                 printSolution(node,enteredNodesCounter, expandedNodesCounter);
@@ -387,9 +386,11 @@ public class TilePuzzle {
             array list and the array list is traversed seeing if current board
             configuration exists (if not node configuration is added to frontier) and
             if it exists checks to see which one of the two node board configurations
-            has a lower f(n). keeps the lower f(n) and discards the other
+            has a lower f(n). keeps the lower f(n) and discards the other. Expanded counter
+            is also incremented
              */
             ArrayList<Node> successorNodes = successors(node, heuristicChoice);
+            expandedNodesCounter++;
             for (int i = 0; i < successorNodes.size(); i++) {
                 Node successorNode = successorNodes.get(i);
 
@@ -409,6 +410,7 @@ public class TilePuzzle {
                 }
 
                 }
+
             }
         }
 
