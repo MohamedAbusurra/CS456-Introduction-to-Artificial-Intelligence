@@ -46,9 +46,9 @@ public class Main {
 
             if (searchMethodChosen == 2){
                 System.out.println("A* search method with h" + heuristicChosen + ":");
-                tilePuzzle.greedyFirstSearch(start, heuristicChosen);
+                tilePuzzle.aStarSearch(start, heuristicChosen);
             }
-            
+
         }
 
     }
