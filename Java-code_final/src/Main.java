@@ -1,17 +1,32 @@
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
 
         TilePuzzle tilePuzzle = new TilePuzzle();
         Scanner scanner = new Scanner(System.in);
 
-        int[][] start = {
+        /*int[][] start = {
                 {8, 7, 6},
                 {0, 4, 1},
                 {2, 5, 3}
-        };
+        };*/
+
+        int[][] start = new int[3][3];
+        File inputConfiguration = new File("input.txt");
+        try {
+            Scanner fileScanner = new Scanner(inputConfiguration);
+            for (int i = 0; i < start.length; i++) {
+                for (int j = 0; j < start.length; j++) {
+                    start[i][j] = fileScanner.nextInt();
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+        }
 
 
         while (true) {
