@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.Collections;
+
 public class TilePuzzle {
 
     private int n = 3;
@@ -59,6 +62,13 @@ public class TilePuzzle {
             }
         }
         return heuristic;
+    }
+
+    private int Heuristic(int[][] state, int heuristicChoice) {
+        if(heuristicChoice == 1)
+            return h1(state);
+
+        return h2(state);
     }
 
     private int[] findBlank(int[][] state) {
@@ -145,6 +155,104 @@ public class TilePuzzle {
         return null;
     }
 
+    private int lowestFrontierGreedyIndex(ArrayList<Node> frontier){
+        int lowestHeuristicIndex = 0;
+        for (int i = 1; i < frontier.size(); i++) {
+            if (frontier.get(i).h_n < frontier.get(lowestHeuristicIndex).h_n)
+                lowestHeuristicIndex = i;
+        }
+        return lowestHeuristicIndex;
+    }
+
+    private ArrayList<Node> successors(Node node, int heuristicChoice) {
+        ArrayList<Node> successorNodes = new ArrayList<Node>();
+        int h_n_successor;
+        int g_n_successor = node.g_n + 1;
 
 
+        int[][] moveUp = moveUp(node.state);
+        if(moveUp != null) {
+            h_n_successor = Heuristic(moveUp, heuristicChoice);
+            successorNodes.add(new Node(moveUp, node, "Up", h_n_successor, g_n_successor, h_n_successor + g_n_successor));
+        }
+
+        int[][] moveDown = moveDown(node.state);
+        if(moveDown != null) {
+            h_n_successor = Heuristic(moveDown, heuristicChoice);
+            successorNodes.add(new Node(moveUp, node, "down", h_n_successor, g_n_successor, h_n_successor + g_n_successor));
+        }
+
+        int[][] moveLeft = moveLeft(node.state);
+        if(moveLeft != null) {
+            h_n_successor = Heuristic(moveLeft, heuristicChoice);
+            successorNodes.add(new Node(moveLeft, node, "left", h_n_successor, g_n_successor, h_n_successor + g_n_successor));
+        }
+
+        int[][] moveRight = moveRight(node.state);
+        if(moveRight != null) {
+            h_n_successor = Heuristic(moveRight, heuristicChoice);
+            successorNodes.add(new Node(moveRight, node, "right", h_n_successor, g_n_successor, h_n_successor + g_n_successor));
+        }
+
+        return successorNodes;
+
+    }
+
+    private void printSolution(Node goalNode){
+        ArrayList<Node> path = new ArrayList<Node>();
+
+        for(Node node = goalNode; node !=null; node=goalNode.parent)
+            path.add(node);
+        Collections.reverse(path);
+
+        System.out.println("Solution");
+        System.out.println("number of actions:" + (path.size() - 1));
+
+        for (int i = 1; i < path.size(); i++) {
+            System.out.println("Step " + i + ": ");
+            printBoard(path.get(i).state);
+            System.out.println();
+        }
+
+    }
+
+    private void printBoard(int[][] state){
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < n; j++){
+                System.out.print(state[i][j] + " ");
+            }
+        }
+    }
+
+
+
+    public void greedyFirstSearch(int[][] start, int heuristicChoice){
+        ArrayList<Node> frontier = new ArrayList<>();
+        ArrayList<Node> expanded = new ArrayList<>();
+
+        int h_n = Heuristic(start, heuristicChoice);
+        frontier.add(new Node(copyBoard(start), null,null, 0, h_n, h_n));
+
+        while (!frontier.isEmpty()){
+            int index = lowestFrontierGreedyIndex(frontier);
+            Node node = frontier.remove(index);
+
+            if(isGoal(node.state)){
+                printSolution(node);
+                return;
+            }
+
+            if ( expanded.contains(node) )
+                 continue;
+
+            expanded.add(node);
+
+            ArrayList<Node> successorNodes = successors(node, heuristicChoice);
+            for (int i = 0; i < successorNodes.size(); i++) {
+                Node successorNode = successorNodes.get(i);
+                if (!expanded.contains(successorNode))
+                    frontier.add(successorNode);
+            }
+        }
+    }
 }
