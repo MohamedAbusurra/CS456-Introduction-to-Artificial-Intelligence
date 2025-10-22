@@ -39,7 +39,7 @@ public class Main {
             if(choice.equals("1"))
                 //greedy later with correct h chosen
                 continue;
-            else if(h_choice.equals("2"))
+            else if(choice.equals("2"))
                 //a star later with correct h chosen
                 continue;
             else {
