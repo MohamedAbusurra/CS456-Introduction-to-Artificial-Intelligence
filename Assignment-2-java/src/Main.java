@@ -53,10 +53,11 @@ public class Main {
             }
 
 
-            System.out.println("1. Solve with heuristic one");
-            System.out.println("2. Solve with heuristic two");
-            System.out.print("Enter heuristic choice: ");
-            int heuristicChosen = scanner.nextInt();
+            //System.out.println("1. Solve with heuristic one");
+            //System.out.println("2. Solve with heuristic two");
+            //System.out.print("Enter heuristic choice: ");
+            //int heuristicChosen = scanner.nextInt();
+            int heuristicChosen = 2;
 
             if(heuristicChosen != 1 && heuristicChosen != 2){
                 System.out.println("invalid number for heuristic choice entered");
