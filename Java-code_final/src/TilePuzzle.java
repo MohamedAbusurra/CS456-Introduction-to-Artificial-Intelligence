@@ -1,10 +1,12 @@
 public class TilePuzzle {
 
-    private int n;
-    private int[][] start;
-    private int[][] goal;
+    private int n = 3;
 
-    public TilePuzzle(int[][] start, int[][] goal) {
+    private final int[][] goal = {
+            {1, 2, 3},
+            {4, 5, 6},
+            {7, 8, 0}
+    };
 
-    }
+
 }
