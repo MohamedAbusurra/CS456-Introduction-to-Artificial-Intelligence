@@ -7,9 +7,9 @@ public class TilePuzzle {
     private int n = 3;
 
     private final int[][] goal = {
-            {1, 2, 3},
-            {4, 5, 6},
-            {7, 8, 0}
+            {0, 1, 2},
+            {3, 4, 5},
+            {6, 7, 8}
     };
 
     private class Node {
@@ -250,20 +250,20 @@ public class TilePuzzle {
             for (int i = 1; i < path.size(); i++) {
                 System.out.println("Step " + i + ": ");
                 printBoard(path.get(i).state);
-                System.out.println();
+                System.out.println(("\n"));
             }
         }
         if(printPath){
+            System.out.print("actions: [");
             for (int i = 1; i < path.size(); i++) {
-                System.out.print("actions: [");
                 System.out.print(path.get(i).move + ", ");
-                System.out.print("]");
-                System.out.println();
             }
+            System.out.print("]");
+            System.out.println();
         }
         System.out.println("number of actions:" + (path.size() - 1));
-        System.out.println("number of nodes entered frontier" + enteredNodesCounter);
-        System.out.println("number of expanded frontier" + expandedNodesCounter);
+        System.out.println("number of nodes entered frontier: " + enteredNodesCounter);
+        System.out.println("number of expanded frontier: " + expandedNodesCounter);
 
     }
 
@@ -280,21 +280,21 @@ public class TilePuzzle {
     public void greedyFirstSearch(int[][] start, int heuristicChoice) {
         ArrayList<Node> frontier = new ArrayList<>();
         HashSet<Node> expanded = new HashSet<>();
-        int numberOfNodesEnteredFrontier = 0;
-        int numberOfNodesExpandedFrontier = 0;
+        int enteredNodesCounter = 0;
+        int expandedNodesCounter = 0;
 
 
         int h_n = heuristic(start, heuristicChoice);
         frontier.add(new Node(copyBoard(start), null, null, 0, h_n, h_n));
-        numberOfNodesEnteredFrontier++;
+        enteredNodesCounter++;
 
         while (!frontier.isEmpty()) {
             int index = lowestFrontierGreedyIndex(frontier);
             Node node = frontier.remove(index);
-            numberOfNodesExpandedFrontier++;
+            expandedNodesCounter++;
 
             if (isGoal(node.state)) {
-                printSolution(node,numberOfNodesEnteredFrontier,numberOfNodesExpandedFrontier);
+                printSolution(node, enteredNodesCounter, expandedNodesCounter);
                 return;
             }
 
@@ -307,7 +307,7 @@ public class TilePuzzle {
                 Node successorNode = successorNodes.get(i);
                 if (!expanded.contains(successorNode)){
                     frontier.add(successorNode);
-                    numberOfNodesEnteredFrontier++;
+                    enteredNodesCounter++;
                 }
 
             }
@@ -316,6 +316,8 @@ public class TilePuzzle {
 
     public void aStarSearch(int[][] start, int heuristicChoice) {
         ArrayList<Node> frontier = new ArrayList<>();
+        int enteredNodesCounter = 0;
+        int expandedNodesCounter = 0;
 
         int h_n = heuristic(start, heuristicChoice);
         frontier.add(new Node(copyBoard(start), null, null, 0, h_n, h_n));
@@ -325,7 +327,7 @@ public class TilePuzzle {
             Node node = frontier.remove(index);
 
             if (isGoal(node.state)) {
-                printSolution(node);
+                printSolution(node,enteredNodesCounter, expandedNodesCounter);
                 return;
             }
             ArrayList<Node> successorNodes = successors(node, heuristicChoice);

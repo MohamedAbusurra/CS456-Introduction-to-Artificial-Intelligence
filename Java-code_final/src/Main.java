@@ -8,9 +8,9 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         int[][] start = {
-                {1, 4, 3},
-                {2, 5, 6},
-                {7, 8, 0}
+                {7, 6, 2},
+                {4, 3, 5},
+                {1, 0, 8}
         };
 
 
@@ -46,6 +46,7 @@ public class Main {
                 long endTime = System.currentTimeMillis();
                 double totalSearchTime = endTime - startTime / 1000.0;
                 System.out.println("Greedy first search total search time: " + (endTime - startTime) + " seconds");
+                System.out.println("\n\n");
             }
 
             if (searchMethodChosen == 2){
@@ -55,6 +56,7 @@ public class Main {
                 long endTime = System.currentTimeMillis();
                 double totalSearchTime = endTime - startTime / 1000.0;
                 System.out.println("A* search total search time: " + (endTime - startTime) + " seconds");
+                System.out.println("\n\n");
             }
 
         }
