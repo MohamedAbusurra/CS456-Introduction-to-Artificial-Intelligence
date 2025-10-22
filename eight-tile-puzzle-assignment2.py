@@ -27,7 +27,7 @@ class TilePuzzle:
     
     def calculate_h1(self, successor, goal_state):
         heuristic_one = 0 
-        # Traverse the generated tiles row by row.
+        # Traverse the generated tiles row by row.~
         # Ignore zero which is the empty tile.
         # Check each value against the goal state at the same position.
         # If the values do not match (and the tile is not 0), increment the heuristic by one.
@@ -137,62 +137,64 @@ class TilePuzzle:
         return states, actions[1:]  # Skips the initial None action from root
 
     def greedy_best_first_search(self, start, goal, heuristic):
-        # Implements Greedy Best-First Search algorithm using a heap (priority queue).
-        # Initializes the root node containing starting state, no parent, and no action
+        # Implements the Greedy Best-First Search (GBFS) algorithm using a priority queue (heapq).
+        # GBFS expands the node that appears closest to the goal based on the heuristic value only.
         root = {"state": start, "parent": None, "action": None}
 
         # Create an empty list to act as the frontier (priority queue)
-        # The counter is used as a tie breaker for equal priorities so a dict is used not as a tie breaker 
+        # The counter is used as a tie breaker for equal priorities to prevent dict being used as a tie breaker 
         frontier = []
         counter = 0
 
         # Condition so the heuristic chosen during the input is called during the search
         if heuristic == "1":
-            heapq.heappush(frontier,(self.calculate_h1(start,goal), counter, root))
+            heapq.heappush(frontier, (self.calculate_h1(start, goal), counter, root))
         else:
-            heapq.heappush(frontier,(self.calculate_h2(start,goal), counter, root))
+            heapq.heappush(frontier, (self.calculate_h2(start, goal), counter, root))
         
-        # Initializes a set to keep track of explored states so they can be stored in a set
-        explored = set([self.to_tuple(start)])
+        # Initializes a set to keep track of explored states and stores them in a set
+        closed = set()  
         #nodes_generated and nodes_expanded initialized to keep track of number of nodes expanded and generated
-        nodes_generated = 1
+        nodes_entered_frontier = 1
         nodes_expanded = 0
 
         # Searches until frontier is empty or goal is found
-        while frontier: 
-            #takes Node with lost heuristic first (GFS condition) from the frontier
-            _,_,node = heapq.heappop(frontier)
-            nodes_expanded += 1
+        while frontier:
+            # Removes the node from the frontier with the lowest heuristic value
+            _, _, node = heapq.heappop(frontier)
             state = node["state"]
+            key = self.to_tuple(state)
 
+            # Skips if already processed
+            if key in closed:
+                continue
+            closed.add(key)
+            
             # Checks to see if current state is the goal state
             # if goal state, construct path and actions and return solution
             if state == goal:
                 path, actions = self.reconstruct(node)
-                return path, actions, nodes_generated, nodes_expanded
+                return path, actions, nodes_entered_frontier, nodes_expanded
             
+            nodes_expanded += 1
 
-            # Expands current state with all possible successor statees
-            # If a sucessor state has not been explored than compute its priority and store in the frontier
+            # Expand successors
             for successor, action in self.expand_node(state):
-                key = self.to_tuple(successor)
-                if key not in explored:
-                    # Marks state as explored to add revisiting it during the same search
-                    explored.add(key) 
-                    counter += 1
-                    # Builds the new node with a link back to the parent and action for reconstructing solution
-                    new_node = {"state": successor, "parent": node, "action": action}
-                    # Calls the heuristic user chose to compute prioirity for newly expanded state
-                    if heuristic == "1":
-                        priority = self.calculate_h1(successor, goal)
-                    else:
-                        priority = self.calculate_h2(successor, goal)
-                    # pushes new node to the frontier with priority, counter (to resolve tie breaks)
-                    heapq.heappush(frontier, (priority, counter, new_node))
-                    nodes_generated += 1
+                sucessor_key = self.to_tuple(successor)
+                if sucessor_key in closed:
+                    continue
+                counter += 1
+                new_node = {"state": successor, "parent": node, "action": action}
+                if heuristic == "1":
+                    priority = self.calculate_h1(successor, goal)
+                else:
+                    priority = self.calculate_h2(successor, goal)
+                # pushes new node to the frontier with priority, counter (to resolve tie breaks)
+                heapq.heappush(frontier, (priority, counter, new_node))
+                nodes_entered_frontier += 1
 
         # If frontier becomes empty without returning a solutoin, It returns none as no solution exists
-        return None, None, nodes_generated, nodes_expanded
+        return None, None, nodes_entered_frontier, nodes_expanded
 
 
 
