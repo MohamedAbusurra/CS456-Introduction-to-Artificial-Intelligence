@@ -26,6 +26,41 @@ public class TilePuzzle {
         }
     }
 
+    private int h1(int[][] state) {
+        int heuristic = 0;
+        for (int i = 0; i < n; i++) {
+            for(int j = 0; j < n; j++) {
+                if (state[i][j] != 0 && state[i][j] != goal[i][j])
+                    heuristic++;
+            }
+        }
+        return heuristic;
+    }
+
+    private int h2(int[][] state) {
+        int heuristic = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+
+                if (state[i][j] == 0) continue;
+
+                boolean isInRow = false;
+                boolean isInCol = false;
+                for (int k = 0; k < n; k++) {
+                    if (goal[i][k] == state[i][j])
+                        isInRow = true;
+                    if (goal[k][j] == state[i][j])
+                        isInCol = true;
+                }
+                if (!isInRow)
+                    heuristic++;
+                if (!isInCol)
+                    heuristic++;
+            }
+        }
+        return heuristic;
+    }
+
 
 
 }
