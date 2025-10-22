@@ -59,8 +59,8 @@ public class Main {
                 long startTime = System.currentTimeMillis();
                 tilePuzzle.greedyFirstSearch(start, heuristicChosen);
                 long endTime = System.currentTimeMillis();
-                double totalSearchTime = endTime - startTime / 1000.0;
-                System.out.println("Greedy first search total search time: " + (endTime - startTime) + " seconds");
+                double totalSearchTime = (endTime - startTime) / 1000.0;
+                System.out.println("Greedy first search total search time: " + totalSearchTime + " seconds");
                 System.out.println("\n\n");
             }
 
@@ -69,8 +69,8 @@ public class Main {
                 System.out.println("A* search method with h" + heuristicChosen + ":");
                 tilePuzzle.aStarSearch(start, heuristicChosen);
                 long endTime = System.currentTimeMillis();
-                double totalSearchTime = endTime - startTime / 1000.0;
-                System.out.println("A* search total search time: " + (endTime - startTime) + " seconds");
+                double totalSearchTime = (endTime - startTime) / 1000.0;
+                System.out.println("A* search total search time: " + totalSearchTime + " seconds");
                 System.out.println("\n\n");
             }
 
