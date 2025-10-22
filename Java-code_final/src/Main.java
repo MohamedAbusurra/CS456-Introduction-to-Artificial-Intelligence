@@ -18,34 +18,35 @@ public class Main {
             System.out.println("1.solve with greedy best first search method");
             System.out.println("2.solve with A* Search method");
             System.out.println("3.exit");
-            String choice = scanner.next();
+            int searchMethodChosen = scanner.nextInt();
 
-            if (choice.equals("3"))
+            if (searchMethodChosen == 3)
                 break;
+
+            if(searchMethodChosen != 1 && searchMethodChosen != 2){
+                System.out.println("invalid number for search method choice entered");
+                continue;
+            }
+
 
             System.out.println("1. Solve with heuristic one");
             System.out.println("2. Solve with heuristic two");
-            String h_choice = scanner.next();
-            if(h_choice.equals("1"))
-                //fill in logic later
-                continue;
-             else if(h_choice.equals("2"))
-                 //fill in logic later//
-                 continue;
-             else
-                System.out.println("invalid choice entered");
-                 continue;
+            int heuristicChosen = scanner.nextInt();
 
-            if(choice.equals("1"))
-                //greedy later with correct h chosen
-                continue;
-            else if(choice.equals("2"))
-                //a star later with correct h chosen
-                continue;
-            else {
-                System.out.println("invalid choice entered");
-                continue;
-            }
+            if(heuristicChosen == 1)
+                //fill in logic later
+                System.out.println("a");
+             else if(heuristicChosen == 2)
+                 //fill in logic later//
+                System.out.println("a");
+             else
+                System.out.println("invalid number entered");
+
+            if (searchMethodChosen == 1)
+                System.out.println("a");
+            else
+                // call a star later with correct h chosen implementation later
+                System.out.println("b");
 
 
 

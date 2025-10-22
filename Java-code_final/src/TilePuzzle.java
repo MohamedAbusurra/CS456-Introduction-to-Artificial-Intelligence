@@ -32,7 +32,7 @@ public class TilePuzzle {
     private int h1(int[][] state) {
         int heuristic = 0;
         for (int i = 0; i < n; i++) {
-            for(int j = 0; j < n; j++) {
+            for (int j = 0; j < n; j++) {
                 if (state[i][j] != 0 && state[i][j] != goal[i][j])
                     heuristic++;
             }
@@ -65,7 +65,7 @@ public class TilePuzzle {
     }
 
     private int Heuristic(int[][] state, int heuristicChoice) {
-        if(heuristicChoice == 1)
+        if (heuristicChoice == 1)
             return h1(state);
 
         return h2(state);
@@ -101,7 +101,7 @@ public class TilePuzzle {
         int[] blank = findBlank(copy);
         int positionI = blank[0];
         int positionJ = blank[1];
-        if (positionI > 0){
+        if (positionI > 0) {
             int temp = copy[positionI][positionJ];
             copy[positionI][positionJ] = copy[positionI - 1][positionJ];
             copy[positionI - 1][positionJ] = temp;
@@ -116,7 +116,7 @@ public class TilePuzzle {
         int[] blank = findBlank(copy);
         int positionI = blank[0];
         int positionJ = blank[1];
-        if (positionI < n - 1){
+        if (positionI < n - 1) {
             int temp = copy[positionI][positionJ];
             copy[positionI][positionJ] = copy[positionI + 1][positionJ];
             copy[positionI + 1][positionJ] = temp;
@@ -131,7 +131,7 @@ public class TilePuzzle {
         int[] blank = findBlank(copy);
         int positionI = blank[0];
         int positionJ = blank[1];
-        if (positionJ > 0){
+        if (positionJ > 0) {
             int temp = copy[positionI][positionJ];
             copy[positionI][positionJ] = copy[positionI][positionJ - 1];
             copy[positionI][positionJ - 1] = temp;
@@ -140,12 +140,13 @@ public class TilePuzzle {
 
         return null;
     }
+
     private int[][] moveRight(int[][] state) {
         int[][] copy = copyBoard(state);
         int[] blank = findBlank(copy);
         int positionI = blank[0];
         int positionJ = blank[1];
-        if (positionJ < n - 1){
+        if (positionJ < n - 1) {
             int temp = copy[positionI][positionJ];
             copy[positionI][positionJ] = copy[positionI][positionJ + 1];
             copy[positionI][positionJ + 1] = temp;
@@ -155,7 +156,7 @@ public class TilePuzzle {
         return null;
     }
 
-    private int lowestFrontierGreedyIndex(ArrayList<Node> frontier){
+    private int lowestFrontierGreedyIndex(ArrayList<Node> frontier) {
         int lowestHeuristicIndex = 0;
         for (int i = 1; i < frontier.size(); i++) {
             if (frontier.get(i).h_n < frontier.get(lowestHeuristicIndex).h_n)
@@ -164,6 +165,16 @@ public class TilePuzzle {
         return lowestHeuristicIndex;
     }
 
+    private int lowestAStarIndex(ArrayList<Node> frontier) {
+        int lowestFunctionIndex = 0;
+        for (int i = 1; i < frontier.size(); i++) {
+            if (frontier.get(i).f_n < frontier.get(lowestFunctionIndex).f_n)
+                lowestFunctionIndex = i;
+        }
+        return lowestFunctionIndex;
+    }
+
+
     private ArrayList<Node> successors(Node node, int heuristicChoice) {
         ArrayList<Node> successorNodes = new ArrayList<Node>();
         int h_n_successor;
@@ -171,25 +182,25 @@ public class TilePuzzle {
 
 
         int[][] moveUp = moveUp(node.state);
-        if(moveUp != null) {
+        if (moveUp != null) {
             h_n_successor = Heuristic(moveUp, heuristicChoice);
             successorNodes.add(new Node(moveUp, node, "Up", h_n_successor, g_n_successor, h_n_successor + g_n_successor));
         }
 
         int[][] moveDown = moveDown(node.state);
-        if(moveDown != null) {
+        if (moveDown != null) {
             h_n_successor = Heuristic(moveDown, heuristicChoice);
             successorNodes.add(new Node(moveUp, node, "down", h_n_successor, g_n_successor, h_n_successor + g_n_successor));
         }
 
         int[][] moveLeft = moveLeft(node.state);
-        if(moveLeft != null) {
+        if (moveLeft != null) {
             h_n_successor = Heuristic(moveLeft, heuristicChoice);
             successorNodes.add(new Node(moveLeft, node, "left", h_n_successor, g_n_successor, h_n_successor + g_n_successor));
         }
 
         int[][] moveRight = moveRight(node.state);
-        if(moveRight != null) {
+        if (moveRight != null) {
             h_n_successor = Heuristic(moveRight, heuristicChoice);
             successorNodes.add(new Node(moveRight, node, "right", h_n_successor, g_n_successor, h_n_successor + g_n_successor));
         }
@@ -198,10 +209,10 @@ public class TilePuzzle {
 
     }
 
-    private void printSolution(Node goalNode){
+    private void printSolution(Node goalNode) {
         ArrayList<Node> path = new ArrayList<Node>();
 
-        for(Node node = goalNode; node !=null; node=goalNode.parent)
+        for (Node node = goalNode; node != null; node = goalNode.parent)
             path.add(node);
         Collections.reverse(path);
 
@@ -216,34 +227,33 @@ public class TilePuzzle {
 
     }
 
-    private void printBoard(int[][] state){
-        for(int i = 0; i < n; i++){
-            for(int j = 0; j < n; j++){
+    private void printBoard(int[][] state) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
                 System.out.print(state[i][j] + " ");
             }
         }
     }
 
 
-
-    public void greedyFirstSearch(int[][] start, int heuristicChoice){
+    public void greedyFirstSearch(int[][] start, int heuristicChoice) {
         ArrayList<Node> frontier = new ArrayList<>();
         ArrayList<Node> expanded = new ArrayList<>();
 
         int h_n = Heuristic(start, heuristicChoice);
-        frontier.add(new Node(copyBoard(start), null,null, 0, h_n, h_n));
+        frontier.add(new Node(copyBoard(start), null, null, 0, h_n, h_n));
 
-        while (!frontier.isEmpty()){
+        while (!frontier.isEmpty()) {
             int index = lowestFrontierGreedyIndex(frontier);
             Node node = frontier.remove(index);
 
-            if(isGoal(node.state)){
+            if (isGoal(node.state)) {
                 printSolution(node);
                 return;
             }
 
-            if ( expanded.contains(node) )
-                 continue;
+            if (expanded.contains(node))
+                continue;
 
             expanded.add(node);
 
@@ -255,4 +265,29 @@ public class TilePuzzle {
             }
         }
     }
-}
+
+    public void aStarSearch(int[][] start, int heuristicChoice) {
+        ArrayList<Node> frontier = new ArrayList<>();
+
+        int h_n = Heuristic(start, heuristicChoice);
+        frontier.add(new Node(copyBoard(start), null, null, 0, h_n, h_n));
+
+        while (!frontier.isEmpty()) {
+            int index = lowestAStarIndex(frontier);
+            Node node = frontier.remove(index);
+
+            if (isGoal(node.state)) {
+                printSolution(node);
+                return;
+            }
+            ArrayList<Node> successorNodes = successors(node, heuristicChoice);
+            for (int i = 0; i < successorNodes.size(); i++) {
+                continue;
+                }
+            }
+        }
+
+
+
+    }
+
