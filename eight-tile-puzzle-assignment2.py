@@ -26,21 +26,19 @@ class TilePuzzle:
         return successor
     
     def calculate_h1(self, successor, goal_state):
-        heuristic_one = 0 
-        # Traverse the generated tiles row by row.~
+        heuristic_one = 0
+        # Traverse the generated tiles row by row.
         # Ignore zero which is the empty tile.
         # Check each value against the goal state at the same position.
         # If the values do not match (and the tile is not 0), increment the heuristic by one.
         for i in range(len(successor)):
             for j in range(len(successor[i])):
                 if successor[i][j] != goal_state[i][j] and successor[i][j] != 0:
-                   heuristic_one += 1
-
+                    heuristic_one += 1
         return heuristic_one
     
     def calculate_h2(self, successor, goal_state):
         heuristic_two = 0
-
         # Traverse the grid row by row (row-major order).
         # Ignore zero, which is the empty tile.
         # For each row, get the corresponding row from the goal_state.
@@ -50,7 +48,7 @@ class TilePuzzle:
             goal_row = goal_state[i]
             for j in range(len(successor[i])):
                 if successor[i][j] not in goal_row and successor[i][j] != 0:
-                   heuristic_two += 1
+                    heuristic_two += 1
 
         # Traverse the grid column by column (column-major order).
         # Ignore zero, which is the empty tile.
@@ -61,8 +59,7 @@ class TilePuzzle:
             goal_col = [row[j] for row in goal_state]
             for i in range(len(successor)):
                 if successor[i][j] not in goal_col and successor[i][j] != 0:
-                   heuristic_two += 1
-
+                    heuristic_two += 1
         return heuristic_two
     
     def to_tuple(self, state):
@@ -75,7 +72,7 @@ class TilePuzzle:
         # Checks that the blank tile is not on the top row (x > 0) before swapping.
         x, y = self.find_blank(state)
         if x > 0:
-            return self.copy_and_swap(state, x, y, x-1, y), "Up"
+            return self.copy_and_swap(state, x, y, x - 1, y), "Up"
         return None, None
 
     def move_down(self, state):
@@ -83,7 +80,7 @@ class TilePuzzle:
         # Checks that the blank tile is not on the bottom row (x < self.n - 1) before swapping.
         x, y = self.find_blank(state)
         if x < self.n - 1:
-            return self.copy_and_swap(state, x, y, x+1, y), "Down"
+            return self.copy_and_swap(state, x, y, x + 1, y), "Down"
         return None, None
 
     def move_left(self, state):
@@ -91,7 +88,7 @@ class TilePuzzle:
         # Checks that the blank tile is not in the leftmost column (y > 0) before swapping.
         x, y = self.find_blank(state)
         if y > 0:
-            return self.copy_and_swap(state, x, y, x, y-1), "Left"
+            return self.copy_and_swap(state, x, y, x, y - 1), "Left"
         return None, None
 
     def move_right(self, state):
@@ -99,7 +96,7 @@ class TilePuzzle:
         # Checks that the blank tile is not in the rightmost column (y < self.n - 1) before swapping.
         x, y = self.find_blank(state)
         if y < self.n - 1:
-            return self.copy_and_swap(state, x, y, x, y+1), "Right"
+            return self.copy_and_swap(state, x, y, x, y + 1), "Right"
         return None, None
 
     def expand_node(self, state):
@@ -196,9 +193,6 @@ class TilePuzzle:
         # If frontier becomes empty without returning a solutoin, It returns none as no solution exists
         return None, None, nodes_entered_frontier, nodes_expanded
 
-
-
-
     def a_star_search(self, start, goal, heuristic):
         # Implements the A* Search algorithm using a priority queue (heap).
         # Combines sum of path cost and heuristic to choose the next node to explore.
@@ -265,37 +259,34 @@ class TilePuzzle:
 
 
 def reshape(list_one, n):
-    # Converts a 1D list into a 2D list.
-    # Creates an empty board list to store rows.
-    # For each row (from 0 to n-1), slice n values from the flat list in order.
-    # Returns a 2D list representing the tile puzzle.
+    # Converts a 1D list into a nxn list (matrix) representation of the puzzle.
+    # Takes 'n' elements per row to build an n x n grid.
     board = []
     index = 0
     for _ in range(n):
-        board.append(list_one[index:index+n])
+        board.append(list_one[index:index + n])
         index += n
     return board
 
-def display_result(path, actions, generated, expanded, print_steps = True):
-    # Displays the solution path, actions, and search statistics.
-    # Checks if a goal path exists. If it does not, it prints 'No solution found' and exits the function.
-    # If a goal path exists, iterates over each state, printing the step number and board.
-    # Uses len(actions)(sum of actions) as the path cost as each move has uniform cost of 1.
-    # Finally prints nodes generated and expanded so algorithms can be compared by performance metrics.
+
+def display_result(path, actions, entered_frontier, expanded, print_steps=True):
+    # Displays the solution path, actions taken, and search statistics.
+    # If no path is found, prints an appropriate message.
+    # If path is found, prints each state step-by-step and the associated action list.
     if path is None:
         print("No solution found.\n")
         return
     if print_steps:
-         for step, state in enumerate(path):
-             print(f"Step {step}:")
-             for row in state:
-               print(row)
-             print()
-         print("Actions:", actions)
-
+        for step, state in enumerate(path):
+            print(f"Step {step}:")
+            for row in state:
+                print(row)
+            print()
+        print("Actions:", actions)
     print("Solution Cost:", len(actions), "moves")
-    print("Nodes Generated:", generated)
+    print("Nodes Entering Frontier:", entered_frontier)
     print("Nodes Expanded:", expanded)
+
 
 if __name__ == "__main__":
     matrix_size = 3
@@ -305,16 +296,19 @@ if __name__ == "__main__":
     with open('input.txt', 'r') as file:
         start_state = [int(number) for line in file for number in line.split()]
 
-    # Manual entry for start state.
-    # start_state = [8, 7, 6, 0, 4, 1, 2, 5, 3]
-    goal_state  = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    # Manual entry for start state (for quick testing).
+    #start_state = [8,7,6,0,4,1,2,5,3] 
+    goal_state = [0, 1, 2, 3, 4, 5, 6, 7, 8]
     print(start_state)
 
+    # Reshape the start and goal states into 3x3 matrices
     start_state_2d_form = reshape(start_state, matrix_size)
     goal_state_2d_form = reshape(goal_state, matrix_size)
 
+    # Initialize the TilePuzzle object
     puzzle = TilePuzzle(start_state_2d_form)
 
+    # User menu for algorithm and heuristic selection
     while True:
         print("\nSelect the algorithm to solve the Puzzle:")
         print("1. Greedy-Best First Search")
@@ -322,47 +316,30 @@ if __name__ == "__main__":
         print("3. Exit")
 
         choice = input("Enter your choice (1-3): ")
-        
+
+        if choice == "3":
+            break
+
         print("\nSelect the heuristic of choice for solving the Puzzle:")
         print("1. Heuristic function h1 (number of tiles that are not in the correct place)")
         print("2. Heuristic function h2 (number of tiles that are not in the correct row plus number of tiles that are not in the correct column)")
-
         heuristic_choice = input("Enter your choice (1-2): ")
 
-        if choice == "1" and heuristic_choice == "1":
-            print(f"\nInitial configuration: {start_state}\nUsing Greedy-Best First Search with h1 heuristic")
+        # Execute the selected algorithm
+        if choice == "1":
+            print(f"\nInitial configuration: {start_state}\nUsing Greedy-Best First Search with h{heuristic_choice} heuristic")
             start = time.time()
-            path, actions, generated, expanded = puzzle.greedy_best_first_search(start_state_2d_form, goal_state_2d_form, heuristic_choice)
+            path, actions, entered_frontier, expanded = puzzle.greedy_best_first_search(start_state_2d_form, goal_state_2d_form, heuristic_choice)
             end = time.time()
-            display_result(path, actions, generated, expanded,False)
-            print(f"Search time: {end - start} seconds")
-        
-        elif choice == "1" and heuristic_choice == "2":
-            print(f"\nInitial configuration: {start_state}\nUsing Greedy-Best First Search with h2 heuristic")
+        elif choice == "2":
+            print(f"\nInitial configuration: {start_state}\nUsing A* Search with h{heuristic_choice} heuristic")
             start = time.time()
-            path, actions, generated, expanded = puzzle.greedy_best_first_search(start_state_2d_form, goal_state_2d_form, heuristic_choice)
+            path, actions, entered_frontier, expanded = puzzle.a_star_search(start_state_2d_form, goal_state_2d_form, heuristic_choice)
             end = time.time()
-            display_result(path, actions, generated, expanded,False)
-            print(f"Search time: {end - start} seconds")
-
-        elif choice == "2" and heuristic_choice == "1":
-            print(f"\nInitial configuration: {start_state}\nUsing A* Search with h1 heuristic")
-            start = time.time()
-            path, actions, generated, expanded = puzzle.a_star_search(start_state_2d_form, goal_state_2d_form, heuristic_choice)
-            end = time.time()
-            display_result(path, actions, generated, expanded,False)
-            print(f"Search time: {end - start} seconds")
-        
-        elif choice == "2" and heuristic_choice == "2":
-            print(f"\nInitial configuration: {start_state}\nUsing A* Search with h2 heuristic")
-            start = time.time()
-            path, actions, generated, expanded = puzzle.a_star_search(start_state_2d_form, goal_state_2d_form, heuristic_choice)
-            end = time.time()
-            display_result(path, actions, generated, expanded,False)
-            print(f"Search time: {end - start} seconds")
-
-        elif choice == "3":
-            break
-
         else:
-            print("Invalid input. Please enter correct numbers for input choices")
+            print("Invalid input. Please enter correct numbers for input choices.")
+            continue
+
+        # Display results and statistics
+        display_result(path, actions, entered_frontier, expanded, False)
+        print(f"Search time: {end - start} seconds")
