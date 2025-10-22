@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class TilePuzzle {
@@ -316,15 +317,20 @@ public class TilePuzzle {
 
     public void aStarSearch(int[][] start, int heuristicChoice) {
         ArrayList<Node> frontier = new ArrayList<>();
+        HashMap<Node, Integer> lowestSeenF_n = new HashMap<>();
         int enteredNodesCounter = 0;
         int expandedNodesCounter = 0;
 
         int h_n = heuristic(start, heuristicChoice);
-        frontier.add(new Node(copyBoard(start), null, null, 0, h_n, h_n));
+        Node startNode = new Node(copyBoard(start), null, null, 0, h_n, h_n);
+        frontier.add(startNode);
+        lowestSeenF_n.put(startNode, startNode.f_n);
+        enteredNodesCounter++;
 
         while (!frontier.isEmpty()) {
             int index = lowestAStarIndex(frontier);
             Node node = frontier.remove(index);
+            expandedNodesCounter++;
 
             if (isGoal(node.state)) {
                 printSolution(node,enteredNodesCounter, expandedNodesCounter);
@@ -332,7 +338,24 @@ public class TilePuzzle {
             }
             ArrayList<Node> successorNodes = successors(node, heuristicChoice);
             for (int i = 0; i < successorNodes.size(); i++) {
-                continue;
+                Node successorNode = successorNodes.get(i);
+
+                Integer lowestF_n = lowestSeenF_n.get(successorNode);
+
+                // never seen this board -> record and enqueue
+                if (lowestF_n == null) {
+                    lowestSeenF_n.put(successorNode, successorNode.f_n);
+                    frontier.add(successorNode);
+                    enteredNodesCounter++;
+                    continue;
+                }
+
+                if (successorNode.f_n < lowestF_n) {
+                    lowestSeenF_n.remove(successorNode);
+                    lowestSeenF_n.put(successorNode, successorNode.f_n);
+                    enteredNodesCounter++;
+                }
+
                 }
             }
         }

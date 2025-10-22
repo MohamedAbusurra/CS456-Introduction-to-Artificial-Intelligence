@@ -8,9 +8,9 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         int[][] start = {
-                {7, 6, 2},
-                {4, 3, 5},
-                {1, 0, 8}
+                {8, 7, 6},
+                {0, 4, 1},
+                {2, 5, 3}
         };
 
 
