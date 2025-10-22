@@ -61,6 +61,90 @@ public class TilePuzzle {
         return heuristic;
     }
 
+    private int[] findBlank(int[][] state) {
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                if (state[i][j] == 0)
+                    return new int[]{i, j};
+
+        return new int[]{-1, -1};
+    }
+
+    private int[][] copyBoard(int[][] state) {
+        int[][] copy = new int[n][n];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                copy[i][j] = state[i][j];
+        return copy;
+    }
+
+    private boolean isGoal(int[][] state) {
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                if (state[i][j] != goal[i][j])
+                    return false;
+        return true;
+    }
+
+    private int[][] moveUp(int[][] state) {
+        int[][] copy = copyBoard(state);
+        int[] blank = findBlank(copy);
+        int positionI = blank[0];
+        int positionJ = blank[1];
+        if (positionI > 0){
+            int temp = copy[positionI][positionJ];
+            copy[positionI][positionJ] = copy[positionI - 1][positionJ];
+            copy[positionI - 1][positionJ] = temp;
+            return copy;
+        }
+
+        return null;
+    }
+
+    private int[][] moveDown(int[][] state) {
+        int[][] copy = copyBoard(state);
+        int[] blank = findBlank(copy);
+        int positionI = blank[0];
+        int positionJ = blank[1];
+        if (positionI < n - 1){
+            int temp = copy[positionI][positionJ];
+            copy[positionI][positionJ] = copy[positionI + 1][positionJ];
+            copy[positionI + 1][positionJ] = temp;
+            return copy;
+        }
+
+        return null;
+    }
+
+    private int[][] moveLeft(int[][] state) {
+        int[][] copy = copyBoard(state);
+        int[] blank = findBlank(copy);
+        int positionI = blank[0];
+        int positionJ = blank[1];
+        if (positionJ > 0){
+            int temp = copy[positionI][positionJ];
+            copy[positionI][positionJ] = copy[positionI][positionJ - 1];
+            copy[positionI][positionJ - 1] = temp;
+            return copy;
+        }
+
+        return null;
+    }
+    private int[][] moveRight(int[][] state) {
+        int[][] copy = copyBoard(state);
+        int[] blank = findBlank(copy);
+        int positionI = blank[0];
+        int positionJ = blank[1];
+        if (positionJ < n - 1){
+            int temp = copy[positionI][positionJ];
+            copy[positionI][positionJ] = copy[positionI][positionJ + 1];
+            copy[positionI][positionJ + 1] = temp;
+            return copy;
+        }
+
+        return null;
+    }
+
 
 
 }
