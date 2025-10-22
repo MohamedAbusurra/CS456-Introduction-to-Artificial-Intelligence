@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 
 public class TilePuzzle {
 
@@ -27,6 +28,31 @@ public class TilePuzzle {
             this.h_n = h_n;
             this.f_n = f_n;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            Node node = (Node) obj;
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (state[i][j] != node.state[i][j])
+                        return false;
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode(){
+            int hash = 7; // start from a nonzero constant
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    hash = 31 * hash + state[i][j];
+                }
+            }
+            return hash;
+        }
+
+
     }
 
     private int h1(int[][] state) {
@@ -209,21 +235,35 @@ public class TilePuzzle {
 
     }
 
-    private void printSolution(Node goalNode) {
+    private void printSolution(Node goalNode, int enteredNodesCounter, int expandedNodesCounter) {
         ArrayList<Node> path = new ArrayList<Node>();
 
         for (Node node = goalNode; node != null; node = node.parent)
             path.add(node);
         Collections.reverse(path);
 
-        System.out.println("Solution");
-        System.out.println("number of actions:" + (path.size() - 1));
 
-        for (int i = 1; i < path.size(); i++) {
-            System.out.println("Step " + i + ": ");
-            printBoard(path.get(i).state);
-            System.out.println();
+        boolean printSteps = false;
+        boolean printPath = false;
+        System.out.println("Solution");
+        if(printSteps){
+            for (int i = 1; i < path.size(); i++) {
+                System.out.println("Step " + i + ": ");
+                printBoard(path.get(i).state);
+                System.out.println();
+            }
         }
+        if(printPath){
+            for (int i = 1; i < path.size(); i++) {
+                System.out.print("actions: [");
+                System.out.print(path.get(i).move + ", ");
+                System.out.print("]");
+                System.out.println();
+            }
+        }
+        System.out.println("number of actions:" + (path.size() - 1));
+        System.out.println("number of nodes entered frontier" + enteredNodesCounter);
+        System.out.println("number of expanded frontier" + expandedNodesCounter);
 
     }
 
@@ -239,30 +279,37 @@ public class TilePuzzle {
 
     public void greedyFirstSearch(int[][] start, int heuristicChoice) {
         ArrayList<Node> frontier = new ArrayList<>();
-        ArrayList<Node> expanded = new ArrayList<>();
+        HashSet<Node> expanded = new HashSet<>();
+        int numberOfNodesEnteredFrontier = 0;
+        int numberOfNodesExpandedFrontier = 0;
+
 
         int h_n = heuristic(start, heuristicChoice);
         frontier.add(new Node(copyBoard(start), null, null, 0, h_n, h_n));
+        numberOfNodesEnteredFrontier++;
 
         while (!frontier.isEmpty()) {
             int index = lowestFrontierGreedyIndex(frontier);
             Node node = frontier.remove(index);
+            numberOfNodesExpandedFrontier++;
 
             if (isGoal(node.state)) {
-                printSolution(node);
+                printSolution(node,numberOfNodesEnteredFrontier,numberOfNodesExpandedFrontier);
                 return;
             }
 
             if (expanded.contains(node))
                 continue;
-
             expanded.add(node);
 
             ArrayList<Node> successorNodes = successors(node, heuristicChoice);
             for (int i = 0; i < successorNodes.size(); i++) {
                 Node successorNode = successorNodes.get(i);
-                if (!expanded.contains(successorNode))
+                if (!expanded.contains(successorNode)){
                     frontier.add(successorNode);
+                    numberOfNodesEnteredFrontier++;
+                }
+
             }
         }
     }
